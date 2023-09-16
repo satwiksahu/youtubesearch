@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube video search</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>YOUTUBE Video Search</h1>
+    <input type="text" id="searchTerm" onkeypress="if(event.keyCode==13){searchYoutube();}" placeholder="Enter your search term">
+    <button onclick="searchYoutube()"> Search </button>
+    <div id="searchResults"></div>
+
+
+    <script>
+        function searchYoutube() {
+            var apikey = 'AIzaSyBmvltJzHZLc4VtySiKWQb2u-6uJ9lxQvo';
+            var searchterm = document.getElementById('searchTerm').value;
+
+            $.ajax({
+                method: 'GET',
+                url: 'https://www.googleapis.com/youtube/v3/search',
+                data: {
+                    key: apikey,
+                    q: searchterm,
+                    part: 'snippet',
+                    maxResults: 5,
+                    type: 'video',
+                    videoEmbeddable: true,
+                },
+                
+                success:function(data){
+                    displayResults(data);
+                },
+
+                error:function(response){
+                    console.log("Request Failed");
+                }
+            });
+        }
+
+        function displayResults(data){
+            var searchResults= document.getElementById('searchResults');
+            searchResults.innerHTML= '';
+
+            data.items.forEach(function(item){
+                var videoTitle= item.snippet.title;
+                var videoId= item.id.videoId;
+                var videoThumbnail= item.snippet.thumbnails.medium.url;
+
+                var videoDiv=document.createElement('div');
+                videoDiv.innerHTML= `
+                <h3>${videoTitle}</h3>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+                `;
+                searchResults.appendChild(videoDiv);
+            });
+        }
+    </script>
+</body>
+</html>
